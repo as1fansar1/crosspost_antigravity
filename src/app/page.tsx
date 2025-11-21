@@ -1,66 +1,64 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import { cookies } from 'next/headers';
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const xConnected = cookieStore.has('x_access_token');
+  const threadsConnected = cookieStore.has('threads_access_token');
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="container">
+      <h1 className="title">CrossPost</h1>
+      <p className="subtitle">Seamlessly publish to X and Threads at once.</p>
+
+      <div className="card">
+        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>Connect Accounts</h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>𝕏</span>
+              <div>
+                <div style={{ fontWeight: 600 }}>X (Twitter)</div>
+                <div style={{ fontSize: '0.875rem', color: '#888' }}>
+                  {xConnected ? <span className="status-badge status-connected">Connected</span> : <span className="status-badge status-disconnected">Not Connected</span>}
+                </div>
+              </div>
+            </div>
+            {!xConnected && (
+              <a href="/api/auth/twitter?action=login" className="btn btn-x">
+                Connect X
+              </a>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>@</span>
+              <div>
+                <div style={{ fontWeight: 600 }}>Threads</div>
+                <div style={{ fontSize: '0.875rem', color: '#888' }}>
+                  {threadsConnected ? <span className="status-badge status-connected">Connected</span> : <span className="status-badge status-disconnected">Not Connected</span>}
+                </div>
+              </div>
+            </div>
+            {!threadsConnected && (
+              <a href="/api/auth/threads?action=login" className="btn btn-threads">
+                Connect Threads
+              </a>
+            )}
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+          <Link href="/compose" className={`btn btn-primary ${(!xConnected && !threadsConnected) ? 'opacity-50 pointer-events-none' : ''}`}>
+            Start Writing →
+          </Link>
+          {(!xConnected && !threadsConnected) && (
+            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#666' }}>Connect at least one account to continue</p>
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
